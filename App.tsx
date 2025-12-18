@@ -11,13 +11,12 @@ import {
   ChevronDown,
   MinusCircle,
   PlusCircle,
-  Truck,
   X,
   Layers,
   Lock,
   ArrowRight
 } from 'lucide-react';
-import { StorageService } from './services/storage';
+import { StorageService } from './services/storage.ts';
 import { 
   InventoryItem, 
   MinStockConfig, 
@@ -27,8 +26,8 @@ import {
   COMPONENT_GROUPS, 
   ComponentGroupName, 
   getItemGroup 
-} from './types';
-import { DEPT_NAME, BRAND_RGB, LOGO_IMAGE } from './constants';
+} from './types.ts';
+import { DEPT_NAME, BRAND_RGB, LOGO_IMAGE } from './constants.ts';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -65,7 +64,6 @@ const App: React.FC = () => {
     setConfigs(storedConfigs);
     setIsInitialized(true);
     
-    // Check if previously authenticated in this session
     const authStatus = sessionStorage.getItem('roggio_auth');
     if (authStatus === 'true') setIsAuthenticated(true);
   }, []);
@@ -179,17 +177,16 @@ const App: React.FC = () => {
     item.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // AUTH SCREEN
   if (!isAuthenticated) {
     return (
       <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-6 z-[200]">
-        <div className="max-w-md w-full animate-in fade-in zoom-in duration-500">
-          <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-200">
+        <div className="max-w-md w-full animate-in zoom-in">
+          <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border">
             <div className="p-12 text-center bg-slate-900">
               <img 
                 src={LOGO_IMAGE} 
                 alt="Roggio Logo" 
-                className="mx-auto mb-8 w-48 h-auto object-contain brightness-0 invert" 
+                className="m-auto mb-8 w-48 h-auto brightness-0 invert" 
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = 'https://www.roggio.com.ar/img/logo-benito-roggio.png';
                 }}
@@ -200,16 +197,16 @@ const App: React.FC = () => {
               </div>
             </div>
             
-            <form onSubmit={handleLogin} className="p-12 space-y-8">
-              <div className="space-y-2 text-center">
-                <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <form onSubmit={handleLogin} className="p-12 gap-8 flex flex-col">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center m-auto mb-4">
                   <Lock size={20} />
                 </div>
-                <h2 className="text-2xl font-black text-slate-900">Acceso Restringido</h2>
+                <h2 className="text-2xl font-black text-slate-900 mb-2">Acceso Restringido</h2>
                 <p className="text-slate-400 text-sm font-bold">Por favor, ingrese su clave de acceso para continuar.</p>
               </div>
 
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div className="relative">
                   <input 
                     autoFocus
@@ -220,16 +217,16 @@ const App: React.FC = () => {
                       setPasswordInput(e.target.value);
                       if (loginError) setLoginError(false);
                     }}
-                    className={`w-full px-8 py-5 bg-slate-50 border-2 rounded-2xl text-center font-black tracking-widest text-slate-900 outline-none transition-all ${loginError ? 'border-red-500 shake-animation' : 'border-slate-100 focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5'}`}
+                    className={`w-full px-8 py-5 bg-slate-50 border-2 rounded-2xl text-center font-black tracking-widest text-slate-900 outline-none transition-all ${loginError ? 'border-red-500 shake-animation' : 'border-slate-100'}`}
                   />
                   {loginError && (
-                    <p className="text-red-500 text-xs font-bold text-center mt-3 animate-bounce">Clave incorrecta. Reintente.</p>
+                    <p className="text-red-500 text-[11px] font-bold text-center mt-3 animate-bounce">Clave incorrecta. Reintente.</p>
                   )}
                 </div>
 
                 <button 
                   type="submit"
-                  className="w-full py-5 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black text-lg shadow-xl shadow-red-600/20 active:scale-95 transition-all flex items-center justify-center gap-3"
+                  className="w-full py-5 bg-red-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-red-600/20 active:scale-95 transition-all flex items-center justify-center gap-3"
                 >
                   INGRESAR AL PANEL
                   <ArrowRight size={20} />
@@ -247,7 +244,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-900 selection:bg-red-100 animate-in fade-in duration-700">
+    <div className="flex bg-slate-50 text-slate-900 selection:bg-red-100 animate-in">
       <aside className="w-72 bg-slate-900 text-white flex flex-col fixed h-full border-r border-slate-800 z-10">
         <div className="p-8 border-b border-slate-800 flex justify-center items-center h-24">
           <div className="flex flex-col items-center">
@@ -255,13 +252,13 @@ const App: React.FC = () => {
              <span className="text-[10px] font-black tracking-[0.4em] uppercase text-slate-400">Panel Control</span>
           </div>
         </div>
-        <nav className="flex-1 p-4 space-y-2 mt-4">
+        <nav className="flex-1 p-4 gap-2 flex flex-col mt-4">
           {[
             { id: 'inventory', label: 'Depósito', icon: Package },
             { id: 'min-stock', label: 'Stock Crítico', icon: AlertTriangle, badge: totalAlerts },
             { id: 'config', label: 'Configuración', icon: Settings }
           ].map(view => (
-            <button key={view.id} onClick={() => setActiveView(view.id as ViewType)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeView === view.id ? 'bg-red-600 shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+            <button key={view.id} onClick={() => setActiveView(view.id as ViewType)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeView === view.id ? 'bg-red-600 shadow-lg' : 'text-slate-400'}`}>
               <view.icon size={20} />
               <span className="font-semibold tracking-wide">{view.label}</span>
               {view.badge ? <span className="ml-auto bg-white text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full">{view.badge}</span> : null}
@@ -278,24 +275,24 @@ const App: React.FC = () => {
             <p className="text-slate-600 mt-2 font-bold flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-red-600"></span>{DEPT_NAME}</p>
           </div>
           {activeView === 'inventory' && (
-            <button onClick={() => setShowAddModal(true)} className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-2xl flex items-center gap-2 font-black shadow-xl shadow-red-600/30 transition-all active:scale-95">
+            <button onClick={() => setShowAddModal(true)} className="bg-red-600 text-white px-8 py-4 rounded-2xl flex items-center gap-2 font-black shadow-xl shadow-red-600/30 transition-all active:scale-95">
               <Plus size={24} /> Agregar Elemento
             </button>
           )}
           {activeView === 'min-stock' && totalAlerts > 0 && (
-            <button onClick={exportPDF} className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-2xl flex items-center gap-3 font-black shadow-xl shadow-red-600/30 transition-all active:scale-95">
+            <button onClick={exportPDF} className="bg-red-600 text-white px-8 py-4 rounded-2xl flex items-center gap-3 font-black shadow-xl shadow-red-600/30 transition-all active:scale-95">
               <FileText size={22} /> Generar Pedido PDF
             </button>
           )}
         </header>
 
-        <div className="bg-white rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-[2rem] shadow-xl border overflow-hidden">
           {activeView === 'inventory' && (
             <>
-              <div className="p-8 border-b border-slate-100 bg-slate-50/30">
+              <div className="p-8 border-b bg-slate-50">
                 <div className="relative w-[32rem]">
-                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                  <input type="text" placeholder="Buscar por código o descripción..." className="w-full pl-14 pr-6 py-4 bg-white border-2 border-slate-100 rounded-2xl text-slate-900 font-bold focus:border-red-500/50 outline-none transition-all" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
+                  <Search className="absolute left-7 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                  <input type="text" placeholder="Buscar por código o descripción..." className="w-full pl-16 pr-6 py-4 bg-white border-2 rounded-2xl text-slate-900 font-bold outline-none transition-all focus:border-red-600/50" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
                 </div>
               </div>
               <div className="overflow-x-auto">
@@ -317,7 +314,7 @@ const App: React.FC = () => {
                       const isAtLimit = item.quantity === min && min > 0;
                       const group = getItemGroup(item.componentType);
                       return (
-                        <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                        <tr key={item.id} className="transition-colors hover:bg-slate-50/50">
                           <td className="px-10 py-6 font-mono text-xs font-black text-slate-950">{item.code}</td>
                           <td className="px-10 py-6 text-sm text-slate-950 font-black">{item.description}</td>
                           <td className="px-10 py-6 text-sm font-bold text-slate-500">{item.equipmentType}</td>
@@ -333,9 +330,9 @@ const App: React.FC = () => {
                               {isAtLimit && <div className="w-2 h-2 rounded-full bg-orange-500"></div>}
                             </div>
                           </td>
-                          <td className="px-10 py-6 text-center space-x-2">
-                            <button onClick={() => setAdjustingItem(item)} className="p-3 bg-slate-50 text-slate-400 hover:text-red-600 rounded-xl transition-all"><PlusCircle size={20}/></button>
-                            <button onClick={() => setItemToDelete(item)} className="p-3 bg-slate-50 text-slate-400 hover:text-red-600 rounded-xl transition-all"><Trash2 size={20}/></button>
+                          <td className="px-10 py-6 text-center gap-2 flex justify-center">
+                            <button onClick={() => setAdjustingItem(item)} className="p-3 bg-slate-50 text-slate-400 rounded-xl transition-all hover:text-red-600"><PlusCircle size={20}/></button>
+                            <button onClick={() => setItemToDelete(item)} className="p-3 bg-slate-50 text-slate-400 rounded-xl transition-all hover:text-red-600"><Trash2 size={20}/></button>
                           </td>
                         </tr>
                       );
@@ -347,15 +344,14 @@ const App: React.FC = () => {
           )}
 
           {activeView === 'min-stock' && (
-            <div className="p-8 space-y-12">
-              {/* Sección Crítica */}
+            <div className="p-8 gap-20 flex flex-col">
               {criticalItems.length > 0 && (
                 <section>
                   <div className="flex items-center gap-3 mb-6 bg-red-50 p-4 rounded-2xl border border-red-100">
                     <div className="w-3 h-3 rounded-full bg-red-600 animate-pulse"></div>
                     <h3 className="font-black text-red-600 uppercase tracking-widest text-sm">Urgente (Bajo el Mínimo)</h3>
                   </div>
-                  <div className="overflow-x-auto border border-slate-100 rounded-2xl">
+                  <div className="overflow-x-auto border rounded-2xl shadow-sm">
                     <table className="w-full text-left">
                       <thead>
                         <tr className="bg-slate-200 text-[10px] font-black uppercase text-slate-900 tracking-wider">
@@ -371,7 +367,7 @@ const App: React.FC = () => {
                         {criticalItems.map(item => {
                           const min = getItemMinStock(item);
                           return (
-                            <tr key={item.id}>
+                            <tr key={item.id} className="hover:bg-slate-50/50">
                               <td className="px-6 py-4 font-mono text-xs font-black text-black">{item.code}</td>
                               <td className="px-6 py-4 text-sm font-black text-black">{item.description}</td>
                               <td className="px-6 py-4 text-center text-xs font-bold text-slate-600">{getItemGroup(item.componentType)}</td>
@@ -387,14 +383,13 @@ const App: React.FC = () => {
                 </section>
               )}
 
-              {/* Sección Al Límite */}
               {atLimitItems.length > 0 && (
                 <section>
                   <div className="flex items-center gap-3 mb-6 bg-orange-50 p-4 rounded-2xl border border-orange-100">
                     <div className="w-3 h-3 rounded-full bg-orange-500"></div>
                     <h3 className="font-black text-orange-600 uppercase tracking-widest text-sm">En Umbral (Considerar Reposición)</h3>
                   </div>
-                  <div className="overflow-x-auto border border-slate-100 rounded-2xl">
+                  <div className="overflow-x-auto border rounded-2xl shadow-sm">
                     <table className="w-full text-left">
                       <thead>
                         <tr className="bg-slate-200 text-[10px] font-black uppercase text-slate-900 tracking-wider">
@@ -409,7 +404,7 @@ const App: React.FC = () => {
                         {atLimitItems.map(item => {
                           const min = getItemMinStock(item);
                           return (
-                            <tr key={item.id}>
+                            <tr key={item.id} className="hover:bg-slate-50/50">
                               <td className="px-6 py-4 font-mono text-xs font-black text-black">{item.code}</td>
                               <td className="px-6 py-4 text-sm font-black text-black">{item.description}</td>
                               <td className="px-6 py-4 text-center text-xs font-bold text-slate-600">{getItemGroup(item.componentType)}</td>
@@ -421,7 +416,7 @@ const App: React.FC = () => {
                       </tbody>
                     </table>
                   </div>
-                  <p className="mt-4 text-[11px] text-slate-500 font-bold italic flex items-center gap-2">
+                  <p className="mt-4 text-[11px] text-slate-500 font-bold flex items-center gap-2 px-2">
                     <AlertTriangle size={14} className="text-orange-500" />
                     * La adquisición de estos elementos está sujeta a revisión de stock proyectado.
                   </p>
@@ -430,7 +425,7 @@ const App: React.FC = () => {
 
               {totalAlerts === 0 && (
                 <div className="py-24 text-center">
-                  <Package className="mx-auto text-slate-200 mb-4" size={64} />
+                  <Package className="m-auto text-slate-200 mb-4" size={64} />
                   <p className="text-slate-400 font-black text-lg">Depósito con niveles suficientes.</p>
                 </div>
               )}
@@ -438,7 +433,7 @@ const App: React.FC = () => {
           )}
 
           {activeView === 'config' && (
-            <div className="p-12 space-y-16">
+            <div className="p-12 gap-16 flex flex-col">
               <section>
                 <div className="flex items-center gap-4 mb-8">
                   <div className="p-4 bg-red-50 text-red-600 rounded-2xl border border-red-100"><Layers size={32} /></div>
@@ -447,7 +442,7 @@ const App: React.FC = () => {
                     <p className="text-slate-500 font-bold">Determina el stock mínimo para cada intersección de Equipo y Grupo.</p>
                   </div>
                 </div>
-                <div className="overflow-x-auto border-2 border-slate-50 rounded-[2rem]">
+                <div className="overflow-x-auto border-2 border-slate-50 rounded-[2rem] shadow-sm">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest">
@@ -457,7 +452,7 @@ const App: React.FC = () => {
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {EQUIPMENT_TYPES.map(eq => (
-                        <tr key={eq} className="hover:bg-slate-50 transition-colors">
+                        <tr key={eq} className="hover:bg-slate-50/50">
                           <td className="p-6 font-black text-slate-700 text-sm">{eq}</td>
                           {(Object.keys(COMPONENT_GROUPS) as ComponentGroupName[]).map(group => {
                             const config = configs.find(c => c.equipmentType === eq && c.componentGroup === group);
@@ -468,7 +463,7 @@ const App: React.FC = () => {
                                   min="0"
                                   value={config?.minQuantity || 0}
                                   onChange={(e) => updateMatrixConfig(eq, group, parseInt(e.target.value) || 0)}
-                                  className="w-full max-w-[80px] mx-auto block px-3 py-2 bg-white border-2 border-slate-200 rounded-xl text-center font-black focus:border-red-500 outline-none text-slate-950"
+                                  className="w-full max-w-[80px] m-auto block px-3 py-2 bg-white border-2 rounded-xl text-center font-black outline-none text-slate-950 focus:border-red-600/50"
                                 />
                               </td>
                             );
@@ -486,12 +481,12 @@ const App: React.FC = () => {
 
       {/* MODAL BORRAR */}
       {itemToDelete && (
-        <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[110] flex items-center justify-center p-6">
-          <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden p-10 text-center animate-in zoom-in duration-200">
-            <div className="w-20 h-20 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-red-100"><Trash2 size={40} /></div>
+        <div className="fixed inset-0 bg-slate-900 z-[110] flex items-center justify-center p-6" style={{backgroundColor: 'rgba(15, 23, 42, 0.9)'}}>
+          <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden p-10 text-center animate-in zoom-in">
+            <div className="w-20 h-20 bg-red-50 text-red-600 rounded-full flex items-center justify-center m-auto mb-6 border-4 border-red-100"><Trash2 size={40} /></div>
             <h3 className="text-2xl font-black text-slate-900 mb-3">¿Eliminar elemento?</h3>
             <p className="text-slate-500 font-bold mb-8">Confirmas la baja de <span className="text-slate-900">"{itemToDelete.description}"</span>.</p>
-            <div className="space-y-3">
+            <div className="flex flex-col gap-3">
               <button onClick={confirmDelete} className="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all">ELIMINAR AHORA</button>
               <button onClick={() => setItemToDelete(null)} className="w-full py-4 bg-slate-100 text-slate-500 rounded-2xl font-black transition-all">CANCELAR</button>
             </div>
@@ -501,25 +496,25 @@ const App: React.FC = () => {
 
       {/* MODAL AJUSTAR STOCK */}
       {adjustingItem && (
-        <div className="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[60] flex items-center justify-center p-6">
-          <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in duration-300">
-            <div className="bg-slate-50/50 px-10 py-10 border-b border-slate-100 text-center">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-6" style={{backgroundColor: 'rgba(15, 23, 42, 0.95)'}}>
+          <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in">
+            <div className="bg-slate-50 px-10 py-10 border-b text-center">
               <span className="text-[11px] font-black text-red-600 uppercase tracking-widest mb-3 block">Movimiento Depósito</span>
               <h3 className="text-3xl font-black text-slate-900">{adjustingItem.description}</h3>
               <p className="text-slate-400 font-mono text-sm mt-1">{adjustingItem.code}</p>
             </div>
-            <div className="p-12 space-y-8 bg-white text-center">
+            <div className="p-12 gap-8 flex flex-col bg-white text-center">
               <div className="text-7xl font-black text-slate-900 tracking-tighter mb-10">{adjustingItem.quantity}</div>
-              <div className="bg-slate-50 p-6 rounded-[2rem] flex items-center justify-center gap-8 border border-slate-100">
-                <button onClick={() => setAdjustAmount(Math.max(1, adjustAmount - 1))} className="w-14 h-14 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 transition-all"><MinusCircle size={28}/></button>
-                <input type="number" min="1" value={adjustAmount} onChange={(e) => setAdjustAmount(Math.max(1, parseInt(e.target.value) || 1))} className="w-20 text-center text-5xl font-black bg-transparent outline-none text-slate-900"/>
-                <button onClick={() => setAdjustAmount(adjustAmount + 1)} className="w-14 h-14 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 transition-all"><PlusCircle size={28}/></button>
+              <div className="bg-slate-900 p-8 rounded-[2rem] flex items-center justify-center gap-8 border border-slate-800 shadow-inner">
+                <button onClick={() => setAdjustAmount(Math.max(1, adjustAmount - 1))} className="w-14 h-14 bg-slate-800 border-none rounded-full flex items-center justify-center text-white hover:text-red-500 transition-all"><MinusCircle size={28}/></button>
+                <input type="number" min="1" value={adjustAmount} onChange={(e) => setAdjustAmount(Math.max(1, parseInt(e.target.value) || 1))} className="w-24 text-center text-6xl font-black bg-transparent outline-none text-white selection:bg-red-900"/>
+                <button onClick={() => setAdjustAmount(adjustAmount + 1)} className="w-14 h-14 bg-slate-800 border-none rounded-full flex items-center justify-center text-white hover:text-red-500 transition-all"><PlusCircle size={28}/></button>
               </div>
               <div className="grid grid-cols-2 gap-4 pt-4">
-                <button onClick={() => handleAdjustStock(false)} disabled={adjustingItem.quantity < adjustAmount} className="py-5 bg-slate-900 text-white rounded-3xl font-black text-lg disabled:opacity-20 active:scale-95 transition-all">EGRESAR</button>
-                <button onClick={() => handleAdjustStock(true)} className="py-5 bg-red-600 text-white rounded-3xl font-black text-lg shadow-xl active:scale-95 transition-all">INGRESAR</button>
+                <button onClick={() => handleAdjustStock(false)} disabled={adjustingItem.quantity < adjustAmount} className="py-5 bg-slate-900 text-white rounded-3xl font-black text-lg transition-all hover:bg-black disabled:opacity-20">EGRESAR</button>
+                <button onClick={() => handleAdjustStock(true)} className="py-5 bg-red-600 text-white rounded-3xl font-black text-lg shadow-xl active:scale-95 transition-all hover:bg-red-700">INGRESAR</button>
               </div>
-              <button onClick={() => setAdjustingItem(null)} className="text-slate-400 font-bold uppercase text-xs tracking-widest">Cerrar</button>
+              <button onClick={() => setAdjustingItem(null)} className="text-slate-400 font-bold uppercase text-xs tracking-widest hover:text-slate-900 transition-colors">Cerrar</button>
             </div>
           </div>
         </div>
@@ -527,29 +522,32 @@ const App: React.FC = () => {
 
       {/* MODAL AGREGAR */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-[100] flex items-center justify-center p-6 overflow-y-auto">
-          <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-3xl overflow-hidden my-auto animate-in slide-in-from-bottom-8">
-            <div className="bg-slate-50/50 px-12 py-10 border-b border-slate-100 flex justify-between items-center">
-              <div>
-                <span className="text-[11px] font-black text-red-600 uppercase tracking-widest mb-2 block">Nuevo Ingreso</span>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 overflow-y-auto" style={{backgroundColor: 'rgba(15, 23, 42, 0.9)'}}>
+          <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-3xl overflow-hidden m-auto animate-in slide-in-from-bottom-8">
+            <div className="bg-slate-50 px-16 py-10 border-b flex justify-between items-center">
+              <div className="flex flex-col text-left w-full">
+                <span className="text-[11px] font-black text-red-600 uppercase tracking-widest mb-1 block">Nuevo Ingreso</span>
                 <h3 className="text-4xl font-black text-slate-900">Alta de Material</h3>
               </div>
-              <button onClick={() => setShowAddModal(false)} className="w-12 h-12 border border-slate-200 rounded-full flex items-center justify-center text-slate-300 hover:text-slate-900 transition-all"><X size={32}/></button>
+              <button onClick={() => setShowAddModal(false)} className="w-12 h-12 border rounded-full flex items-center justify-center text-slate-300 transition-all hover:text-slate-900 hover:border-slate-900"><X size={32}/></button>
             </div>
-            <form onSubmit={handleAddItem} className="p-12 space-y-6">
+            <form onSubmit={handleAddItem} className="p-16 flex flex-col gap-6">
               <div className="grid grid-cols-2 gap-8">
-                <div><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Código</label><input required type="text" className="w-full px-6 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-red-500 transition-all text-slate-900" value={newItem.code} onChange={(e) => setNewItem({...newItem, code: e.target.value})}/></div>
-                <div><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Ubicación</label><input required type="text" className="w-full px-6 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-red-500 transition-all text-slate-900" value={newItem.location} onChange={(e) => setNewItem({...newItem, location: e.target.value})}/></div>
+                <div><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Código</label><input required type="text" className="w-full px-6 py-5 bg-slate-50 border-2 rounded-2xl font-bold outline-none transition-all text-slate-900 focus:border-red-600/50" value={newItem.code} onChange={(e) => setNewItem({...newItem, code: e.target.value})}/></div>
+                <div><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Ubicación</label><input required type="text" className="w-full px-6 py-5 bg-slate-50 border-2 rounded-2xl font-bold outline-none transition-all text-slate-900 focus:border-red-600/50" value={newItem.location} onChange={(e) => setNewItem({...newItem, location: e.target.value})}/></div>
               </div>
-              <div><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Descripción</label><input required type="text" className="w-full px-6 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-red-500 transition-all text-slate-900" value={newItem.description} onChange={(e) => setNewItem({...newItem, description: e.target.value})}/></div>
+              <div><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Descripción</label><input required type="text" className="w-full px-6 py-5 bg-slate-50 border-2 rounded-2xl font-bold outline-none transition-all text-slate-900 focus:border-red-600/50" value={newItem.description} onChange={(e) => setNewItem({...newItem, description: e.target.value})}/></div>
               <div className="grid grid-cols-2 gap-8">
-                <div className="relative"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Categoría</label><select className="w-full px-6 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-red-500 transition-all appearance-none text-slate-900" value={newItem.componentType} onChange={(e) => setNewItem({...newItem, componentType: e.target.value})}>{COMPONENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}</select><ChevronDown className="absolute right-6 bottom-5 text-slate-300 pointer-events-none" size={20}/></div>
-                <div className="relative"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Equipo Destino</label><select className="w-full px-6 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-red-500 transition-all appearance-none text-slate-900" value={newItem.equipmentType} onChange={(e) => setNewItem({...newItem, equipmentType: e.target.value})}>{EQUIPMENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}</select><ChevronDown className="absolute right-6 bottom-5 text-slate-300 pointer-events-none" size={20}/></div>
+                <div className="relative"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Categoría</label><select className="w-full px-6 py-5 bg-slate-50 border-2 rounded-2xl font-bold outline-none appearance-none text-slate-900 focus:border-red-600/50" value={newItem.componentType} onChange={(e) => setNewItem({...newItem, componentType: e.target.value})}>{COMPONENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}</select><ChevronDown className="absolute right-6 bottom-5 text-slate-300 pointer-events-none" size={20}/></div>
+                <div className="relative"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-1">Equipo Destino</label><select className="w-full px-6 py-5 bg-slate-50 border-2 rounded-2xl font-bold outline-none appearance-none text-slate-900 focus:border-red-600/50" value={newItem.equipmentType} onChange={(e) => setNewItem({...newItem, equipmentType: e.target.value})}>{EQUIPMENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}</select><ChevronDown className="absolute right-6 bottom-5 text-slate-300 pointer-events-none" size={20}/></div>
               </div>
-              <div className="pt-6"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center block mb-4">Stock Inicial</label><input required type="number" min="0" className="w-full py-8 bg-slate-900 text-white rounded-[2rem] text-5xl font-black text-center outline-none" value={newItem.quantity} onChange={(e) => setNewItem({...newItem, quantity: parseInt(e.target.value) || 0})}/></div>
+              <div className="pt-6 flex flex-col items-center">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center block mb-4">Stock Inicial</label>
+                <input required type="number" min="0" className="w-full max-w-[180px] py-5 bg-slate-900 text-white rounded-[2rem] text-5xl font-black text-center outline-none shadow-lg" value={newItem.quantity} onChange={(e) => setNewItem({...newItem, quantity: parseInt(e.target.value) || 0})}/>
+              </div>
               <div className="flex gap-4 pt-10">
-                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-5 border-2 border-slate-100 rounded-[2rem] font-black text-slate-400">CANCELAR</button>
-                <button type="submit" className="flex-1 py-5 bg-red-600 text-white rounded-[2rem] font-black text-xl shadow-xl active:scale-95 transition-all">REGISTRAR</button>
+                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-5 border-2 rounded-[2rem] font-black text-slate-400 hover:border-slate-900 hover:text-slate-900 transition-colors">CANCELAR</button>
+                <button type="submit" className="flex-1 py-5 bg-red-600 text-white rounded-[2rem] font-black text-xl shadow-xl active:scale-95 transition-all hover:bg-red-700">REGISTRAR</button>
               </div>
             </form>
           </div>
