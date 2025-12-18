@@ -16,7 +16,7 @@ import {
   Lock,
   ArrowRight
 } from 'lucide-react';
-import { StorageService } from './services/storage.ts';
+import { StorageService } from './services/storage';
 import { 
   InventoryItem, 
   MinStockConfig, 
@@ -26,8 +26,8 @@ import {
   COMPONENT_GROUPS, 
   ComponentGroupName, 
   getItemGroup 
-} from './types.ts';
-import { DEPT_NAME, BRAND_RGB, LOGO_IMAGE } from './constants.ts';
+} from './types';
+import { DEPT_NAME, BRAND_RGB, LOGO_IMAGE } from './constants';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -291,8 +291,8 @@ const App: React.FC = () => {
             <>
               <div className="p-8 border-b bg-slate-50">
                 <div className="relative w-[32rem]">
-                  <Search className="absolute left-7 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                  <input type="text" placeholder="Buscar por código o descripción..." className="w-full pl-16 pr-6 py-4 bg-white border-2 rounded-2xl text-slate-900 font-bold outline-none transition-all focus:border-red-600/50" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
+                  <Search className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-400" size={22} />
+                  <input type="text" placeholder="Buscar por código o descripción..." className="w-full pl-20 pr-6 py-4 bg-white border-2 rounded-2xl text-slate-900 font-bold outline-none transition-all focus:border-red-600/50" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
                 </div>
               </div>
               <div className="overflow-x-auto">
@@ -344,7 +344,7 @@ const App: React.FC = () => {
           )}
 
           {activeView === 'min-stock' && (
-            <div className="p-8 gap-20 flex flex-col">
+            <div className="p-8 gap-28 flex flex-col">
               {criticalItems.length > 0 && (
                 <section>
                   <div className="flex items-center gap-3 mb-6 bg-red-50 p-4 rounded-2xl border border-red-100">
@@ -457,7 +457,7 @@ const App: React.FC = () => {
                           {(Object.keys(COMPONENT_GROUPS) as ComponentGroupName[]).map(group => {
                             const config = configs.find(c => c.equipmentType === eq && c.componentGroup === group);
                             return (
-                              <td key={group} className="p-4">
+                              <td key={group} className="p-4 text-center">
                                 <input 
                                   type="number" 
                                   min="0"
@@ -505,16 +505,19 @@ const App: React.FC = () => {
             </div>
             <div className="p-12 gap-8 flex flex-col bg-white text-center">
               <div className="text-7xl font-black text-slate-900 tracking-tighter mb-10">{adjustingItem.quantity}</div>
-              <div className="bg-slate-900 p-8 rounded-[2rem] flex items-center justify-center gap-8 border border-slate-800 shadow-inner">
-                <button onClick={() => setAdjustAmount(Math.max(1, adjustAmount - 1))} className="w-14 h-14 bg-slate-800 border-none rounded-full flex items-center justify-center text-white hover:text-red-500 transition-all"><MinusCircle size={28}/></button>
-                <input type="number" min="1" value={adjustAmount} onChange={(e) => setAdjustAmount(Math.max(1, parseInt(e.target.value) || 1))} className="w-24 text-center text-6xl font-black bg-transparent outline-none text-white selection:bg-red-900"/>
-                <button onClick={() => setAdjustAmount(adjustAmount + 1)} className="w-14 h-14 bg-slate-800 border-none rounded-full flex items-center justify-center text-white hover:text-red-500 transition-all"><PlusCircle size={28}/></button>
+              <div className="bg-slate-950 p-10 rounded-[2rem] flex flex-col items-center justify-center gap-6 border border-slate-800 shadow-2xl">
+                <div className="flex items-center gap-8">
+                  <button onClick={() => setAdjustAmount(Math.max(1, adjustAmount - 1))} className="w-14 h-14 bg-slate-800 border-none rounded-full flex items-center justify-center text-white hover:bg-red-600 transition-all"><MinusCircle size={32}/></button>
+                  <input type="number" min="1" value={adjustAmount} onChange={(e) => setAdjustAmount(Math.max(1, parseInt(e.target.value) || 1))} className="w-32 text-center text-8xl font-black bg-transparent outline-none text-white selection:bg-red-900 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"/>
+                  <button onClick={() => setAdjustAmount(adjustAmount + 1)} className="w-14 h-14 bg-slate-800 border-none rounded-full flex items-center justify-center text-white hover:bg-red-600 transition-all"><PlusCircle size={32}/></button>
+                </div>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cantidad a Transaccionar</span>
               </div>
               <div className="grid grid-cols-2 gap-4 pt-4">
                 <button onClick={() => handleAdjustStock(false)} disabled={adjustingItem.quantity < adjustAmount} className="py-5 bg-slate-900 text-white rounded-3xl font-black text-lg transition-all hover:bg-black disabled:opacity-20">EGRESAR</button>
                 <button onClick={() => handleAdjustStock(true)} className="py-5 bg-red-600 text-white rounded-3xl font-black text-lg shadow-xl active:scale-95 transition-all hover:bg-red-700">INGRESAR</button>
               </div>
-              <button onClick={() => setAdjustingItem(null)} className="text-slate-400 font-bold uppercase text-xs tracking-widest hover:text-slate-900 transition-colors">Cerrar</button>
+              <button onClick={() => setAdjustingItem(null)} className="text-slate-400 font-bold uppercase text-xs tracking-widest hover:text-slate-900 transition-colors mt-2">Cerrar</button>
             </div>
           </div>
         </div>
@@ -524,12 +527,12 @@ const App: React.FC = () => {
       {showAddModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 overflow-y-auto" style={{backgroundColor: 'rgba(15, 23, 42, 0.9)'}}>
           <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-3xl overflow-hidden m-auto animate-in slide-in-from-bottom-8">
-            <div className="bg-slate-50 px-16 py-10 border-b flex justify-between items-center">
-              <div className="flex flex-col text-left w-full">
+            <div className="bg-slate-50 px-16 py-10 border-b flex justify-center items-center relative">
+              <div className="flex flex-col items-center w-full text-center">
                 <span className="text-[11px] font-black text-red-600 uppercase tracking-widest mb-1 block">Nuevo Ingreso</span>
                 <h3 className="text-4xl font-black text-slate-900">Alta de Material</h3>
               </div>
-              <button onClick={() => setShowAddModal(false)} className="w-12 h-12 border rounded-full flex items-center justify-center text-slate-300 transition-all hover:text-slate-900 hover:border-slate-900"><X size={32}/></button>
+              <button onClick={() => setShowAddModal(false)} className="absolute right-10 top-1/2 -translate-y-1/2 w-12 h-12 border rounded-full flex items-center justify-center text-slate-300 transition-all hover:text-slate-900 hover:border-slate-900"><X size={32}/></button>
             </div>
             <form onSubmit={handleAddItem} className="p-16 flex flex-col gap-6">
               <div className="grid grid-cols-2 gap-8">
@@ -543,7 +546,7 @@ const App: React.FC = () => {
               </div>
               <div className="pt-6 flex flex-col items-center">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center block mb-4">Stock Inicial</label>
-                <input required type="number" min="0" className="w-full max-w-[180px] py-5 bg-slate-900 text-white rounded-[2rem] text-5xl font-black text-center outline-none shadow-lg" value={newItem.quantity} onChange={(e) => setNewItem({...newItem, quantity: parseInt(e.target.value) || 0})}/>
+                <input required type="number" min="0" className="w-full max-w-[110px] py-4 bg-slate-900 text-white rounded-[1.5rem] text-4xl font-black text-center outline-none shadow-2xl border border-slate-700" value={newItem.quantity} onChange={(e) => setNewItem({...newItem, quantity: parseInt(e.target.value) || 0})}/>
               </div>
               <div className="flex gap-4 pt-10">
                 <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-5 border-2 rounded-[2rem] font-black text-slate-400 hover:border-slate-900 hover:text-slate-900 transition-colors">CANCELAR</button>
