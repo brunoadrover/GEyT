@@ -183,14 +183,13 @@ const App: React.FC = () => {
         <div className="max-w-md w-full animate-in zoom-in">
           <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border">
             <div className="p-12 text-center bg-slate-900">
-              <img 
-                src={LOGO_IMAGE} 
-                alt="Roggio Logo" 
-                className="m-auto mb-8 w-48 h-auto brightness-0 invert" 
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://www.roggio.com.ar/img/logo-benito-roggio.png';
-                }}
-              />
+              <div className="bg-[#af2b1e] p-2 rounded-xl inline-block mb-8 shadow-2xl overflow-hidden">
+                <img 
+                  src={LOGO_IMAGE} 
+                  alt="Roggio Logo" 
+                  className="m-auto w-48 h-auto block" 
+                />
+              </div>
               <div className="space-y-2">
                 <h1 className="text-white text-xl font-black uppercase tracking-[0.2em]">Gestión de Stock</h1>
                 <p className="text-slate-400 text-xs font-bold tracking-widest uppercase">{DEPT_NAME}</p>
@@ -246,10 +245,13 @@ const App: React.FC = () => {
   return (
     <div className="flex bg-slate-50 text-slate-900 selection:bg-red-100 animate-in">
       <aside className="w-72 bg-slate-900 text-white flex flex-col fixed h-full border-r border-slate-800 z-10">
-        <div className="p-8 border-b border-slate-800 flex justify-center items-center h-24">
-          <div className="flex flex-col items-center">
-             <div className="w-1.5 h-1.5 rounded-full bg-red-600 mb-2"></div>
-             <span className="text-[10px] font-black tracking-[0.4em] uppercase text-slate-400">Panel Control</span>
+        <div className="p-4 border-b border-slate-800 flex flex-col items-center justify-center h-28 bg-[#af2b1e]">
+          <div className="w-full h-20 flex items-center justify-center overflow-hidden rounded-lg">
+            <img 
+              src={LOGO_IMAGE} 
+              alt="Roggio Logo" 
+              className="w-full h-full object-contain" 
+            />
           </div>
         </div>
         <nav className="flex-1 p-4 gap-2 flex flex-col mt-4">
@@ -258,14 +260,14 @@ const App: React.FC = () => {
             { id: 'min-stock', label: 'Stock Crítico', icon: AlertTriangle, badge: totalAlerts },
             { id: 'config', label: 'Configuración', icon: Settings }
           ].map(view => (
-            <button key={view.id} onClick={() => setActiveView(view.id as ViewType)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeView === view.id ? 'bg-red-600 shadow-lg' : 'text-slate-400'}`}>
+            <button key={view.id} onClick={() => setActiveView(view.id as ViewType)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeView === view.id ? 'bg-red-600 shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
               <view.icon size={20} />
               <span className="font-semibold tracking-wide">{view.label}</span>
               {view.badge ? <span className="ml-auto bg-white text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full">{view.badge}</span> : null}
             </button>
           ))}
         </nav>
-        <div className="p-6 border-t border-slate-800 text-center text-[10px] text-slate-500 font-bold tracking-widest uppercase">GE&T • ROGGIO</div>
+        <div className="p-6 border-t border-slate-800 text-center text-[10px] text-slate-500 font-bold tracking-widest uppercase">GE&T</div>
       </aside>
 
       <main className="flex-1 ml-72 p-10">
