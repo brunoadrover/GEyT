@@ -1,5 +1,5 @@
 
-import { InventoryItem, MinStockConfig } from '../types';
+import { InventoryItem, MinStockConfig } from '../types.ts';
 
 const ITEMS_KEY = 'roggio_inventory_items';
 const CONFIG_KEY = 'roggio_min_stock_configs';

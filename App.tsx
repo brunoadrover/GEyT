@@ -16,7 +16,7 @@ import {
   Lock,
   ArrowRight
 } from 'lucide-react';
-import { StorageService } from './services/storage';
+import { StorageService } from './services/storage.ts';
 import { 
   InventoryItem, 
   MinStockConfig, 
@@ -26,8 +26,8 @@ import {
   COMPONENT_GROUPS, 
   ComponentGroupName, 
   getItemGroup 
-} from './types';
-import { DEPT_NAME, BRAND_RGB, LOGO_IMAGE } from './constants';
+} from './types.ts';
+import { DEPT_NAME, BRAND_RGB, LOGO_IMAGE } from './constants.ts';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
